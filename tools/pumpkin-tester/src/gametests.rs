@@ -169,7 +169,7 @@ pub async fn run_gametests(
     Ok(())
 }
 
-fn force_load_surroundings_chunks(
+pub fn force_load_surroundings_chunks(
     world: &World,
     min_cx: i32,
     max_cx: i32,

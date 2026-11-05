@@ -1,0 +1,7 @@
+{
+  "type": "minecraft:block_based",
+  "environment": "minecraft:default",
+  "structure": "minehouse:tnt_breaks_stone",
+  "max_ticks": 120,
+  "manual_only": false
+}

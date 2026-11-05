@@ -1,0 +1,7 @@
+{
+  "type": "minecraft:block_based",
+  "environment": "minecraft:default",
+  "structure": "minehouse:dispenser_water_flows_7",
+  "max_ticks": 100,
+  "manual_only": false
+}
