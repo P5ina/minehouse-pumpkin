@@ -1,0 +1,6 @@
+# Tests that pass on vanilla 26.3 but not yet on Pumpkin.
+# CI fails when a test not listed here fails on Pumpkin, and when a listed
+# test starts passing (so the list stays honest). One test id per line.
+minehouse:command_execute_if_items
+minehouse:comparator_reads_chest
+minehouse:furnace_smelts_iron

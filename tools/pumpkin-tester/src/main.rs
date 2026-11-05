@@ -2,6 +2,7 @@ mod bot;
 mod bot_tests;
 mod gametests;
 mod harness;
+mod parity;
 
 use std::{net::SocketAddr, process::ExitCode, sync::Arc, time::Instant};
 
@@ -52,6 +53,45 @@ async fn main() -> ExitCode {
     };
 
     harness::prepare_spawn_chunk(&server).await;
+
+    // `pumpkin-tester --parity <report.json>` runs only the MineHouse
+    // vanilla-parity GameTests and writes one result per test.
+    let args: Vec<String> = std::env::args().collect();
+    if let Some(i) = args.iter().position(|a| a == "--parity") {
+        let out = args
+            .get(i + 1)
+            .cloned()
+            .unwrap_or_else(|| "parity-pumpkin.json".into());
+        let results = parity::run_parity(&server).await;
+        server.shutdown().await;
+        return match results {
+            Ok(results) => {
+                let json: Vec<_> = results
+                    .iter()
+                    .map(|r| {
+                        println!("{} {}", if r.passed { "PASS" } else { "FAIL" }, r.test_id);
+                        for m in &r.messages {
+                            println!("    {m}");
+                        }
+                        serde_json::json!({ "test": r.test_id, "passed": r.passed, "messages": r.messages })
+                    })
+                    .collect();
+                if let Err(err) = std::fs::write(
+                    &out,
+                    serde_json::to_string_pretty(&json).unwrap_or_default(),
+                ) {
+                    eprintln!("Failed to write {out}: {err}");
+                    return ExitCode::FAILURE;
+                }
+                println!("Wrote {} parity results to {out}", json.len());
+                ExitCode::SUCCESS
+            }
+            Err(err) => {
+                eprintln!("parity suite failed: {err}");
+                ExitCode::FAILURE
+            }
+        };
+    }
 
     let listener = match TcpListener::bind("127.0.0.1:0").await {
         Ok(l) => l,

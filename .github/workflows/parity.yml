@@ -1,0 +1,85 @@
+name: Vanilla parity
+
+# Runs the MineHouse parity GameTests (assets/tests/datapacks/minehouse-parity)
+# on the vanilla 26.3 server and on Pumpkin, then compares the results.
+# See tools/minehouse-parity/README.md.
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: parity-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  MC_VERSION: "26.3"
+
+jobs:
+  vanilla:
+    name: Vanilla 26.3
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: "25"
+      - name: Cache server.jar
+        uses: actions/cache@v4
+        with:
+          path: vanilla/server.jar
+          key: vanilla-server-${{ env.MC_VERSION }}
+      - name: Download server.jar
+        run: |
+          mkdir -p vanilla
+          if [ ! -f vanilla/server.jar ]; then
+            url=$(curl -fsSL https://piston-meta.mojang.com/mc/game/version_manifest_v2.json \
+              | jq -r --arg v "$MC_VERSION" '.versions[] | select(.id == $v) | .url')
+            curl -fsSL "$url" | jq -r '.downloads.server.url' | xargs curl -fsSL -o vanilla/server.jar
+          fi
+      - name: Run GameTests on vanilla
+        working-directory: vanilla
+        run: |
+          mkdir -p packs
+          cp -r ../assets/tests/datapacks/minehouse-parity packs/
+          java -cp server.jar -DbundlerMainClass=net.minecraft.gametest.Main net.minecraft.bundler.Main \
+            --packs packs --tests 'minehouse:*' --report vanilla.xml || true
+          test -f vanilla.xml
+      - uses: actions/upload-artifact@v4
+        with:
+          name: parity-vanilla
+          path: vanilla/vanilla.xml
+
+  pumpkin:
+    name: Pumpkin
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          submodules: recursive
+      - run: rustup update stable && rustup default stable
+      - uses: Swatinem/rust-cache@v2
+        with:
+          shared-key: parity-${{ runner.os }}
+      - name: Run GameTests on Pumpkin
+        run: cargo run --locked -p pumpkin-tester -- --parity parity-pumpkin.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: parity-pumpkin
+          path: parity-pumpkin.json
+
+  compare:
+    name: Compare
+    needs: [vanilla, pumpkin]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/download-artifact@v5
+        with:
+          path: results
+          merge-multiple: true
+      - run: python3 tools/minehouse-parity/compare.py results/vanilla.xml results/parity-pumpkin.json

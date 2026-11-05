@@ -1,0 +1,7 @@
+{
+  "type": "minecraft:block_based",
+  "environment": "minecraft:default",
+  "structure": "minehouse:furnace_smelts_iron",
+  "max_ticks": 320,
+  "manual_only": false
+}

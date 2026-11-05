@@ -1,0 +1,7 @@
+{
+  "type": "minecraft:block_based",
+  "environment": "minecraft:default",
+  "structure": "minehouse:iron_golem_from_blocks",
+  "max_ticks": 40,
+  "manual_only": false
+}

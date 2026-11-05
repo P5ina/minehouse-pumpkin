@@ -1,0 +1,7 @@
+{
+  "type": "minecraft:block_based",
+  "environment": "minecraft:default",
+  "structure": "minehouse:nether_portal_lights",
+  "max_ticks": 40,
+  "manual_only": false
+}

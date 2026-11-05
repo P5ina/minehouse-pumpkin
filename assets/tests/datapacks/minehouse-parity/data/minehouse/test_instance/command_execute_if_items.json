@@ -1,0 +1,7 @@
+{
+  "type": "minecraft:block_based",
+  "environment": "minecraft:default",
+  "structure": "minehouse:command_execute_if_items",
+  "max_ticks": 20,
+  "manual_only": false
+}
