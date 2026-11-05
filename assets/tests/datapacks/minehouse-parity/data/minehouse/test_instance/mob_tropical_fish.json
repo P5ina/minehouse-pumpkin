@@ -1,0 +1,7 @@
+{
+  "type": "minecraft:block_based",
+  "environment": "minecraft:default",
+  "structure": "minehouse:mob_tropical_fish",
+  "max_ticks": 900,
+  "manual_only": false
+}

@@ -29,8 +29,8 @@ const TESTS_PER_ROW: i32 = 4;
 const BASE_X: i32 = 65;
 const BASE_Y: i32 = 80;
 const BASE_Z: i32 = 66;
-/// Longest test (furnace) needs ~200 ticks; leave headroom for `max_ticks`.
-const MAX_TICKS: usize = 600;
+/// Longest tests (mob kills) allow 1500 ticks; leave headroom for `max_ticks`.
+const MAX_TICKS: usize = 1600;
 
 #[derive(Default)]
 struct CaptureReporter {

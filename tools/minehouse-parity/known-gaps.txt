@@ -1,6 +1,29 @@
 # Tests that pass on vanilla 26.3 but not yet on Pumpkin.
 # CI fails when a test not listed here fails on Pumpkin, and when a listed
 # test starts passing (so the list stays honest). One test id per line.
+
+# commands
 minehouse:command_execute_if_items
+# blocks
 minehouse:comparator_reads_chest
 minehouse:furnace_smelts_iron
+# mobs: shearing with a dispenser (no item / no conversion)
+minehouse:mob_bogged
+minehouse:mob_mooshroom
+minehouse:mob_snow_golem
+# mobs: conversions (lightning, water, powder snow)
+minehouse:mob_pig
+minehouse:mob_zombie
+minehouse:mob_husk
+minehouse:mob_skeleton
+# mobs: burning in daylight
+minehouse:mob_drowned
+minehouse:mob_stray
+minehouse:mob_zombie_villager
+# mobs: attacks
+minehouse:mob_frog
+minehouse:mob_guardian
+minehouse:mob_zoglin
+# mobs: other
+minehouse:mob_copper_golem
+minehouse:mob_magma_cube

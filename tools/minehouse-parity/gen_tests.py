@@ -67,8 +67,16 @@ class Test:
         self.start(pos)
         self.command((x, y + 1, z), "setblock ~ ~1 ~ minecraft:redstone_block")
         rx, ry, rz = x, y + 3, z
-        rel = lambda p: f"~{p[0]-rx} ~{p[1]-ry} ~{p[2]-rz}"
-        self.command((rx, ry, rz), f"execute if {condition(rel)} run setblock ~ ~1 ~ minecraft:redstone_block",
+        def rel(p):
+            if all(isinstance(c, int) for c in p):
+                return f"~{p[0]-rx} ~{p[1]-ry} ~{p[2]-rz}"
+            # a float point: command blocks execute at their block centre
+            return " ".join(f"~{round(c - (o + 0.5), 3):g}" for c, o in zip(p, (rx, ry, rz)))
+
+        clause = condition(rel)
+        if not clause.startswith(("if ", "unless ", "positioned ")):
+            clause = f"if {clause}"
+        self.command((rx, ry, rz), f"execute {clause} run setblock ~ ~1 ~ minecraft:redstone_block",
                      kind="repeating_command_block")
         self.accept((x, y + 5, z))
 
@@ -279,6 +287,13 @@ def nether_portal_lights():
           {"id": "minecraft:dispenser", "Items": [item(0, "minecraft:flint_and_steel")]})
     t.checker((2, 2, 0), lambda r: f"block {r((1, 3, 1))} minecraft:nether_portal")
     return t
+
+
+import mobs  # noqa: E402
+
+_mob_builder = mobs.MobTestBuilder(Test)
+mobs.register(_mob_builder)
+TESTS.extend(_mob_builder.tests)
 
 
 if __name__ == "__main__":

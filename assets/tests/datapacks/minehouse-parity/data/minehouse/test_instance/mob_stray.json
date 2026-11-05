@@ -1,0 +1,7 @@
+{
+  "type": "minecraft:block_based",
+  "environment": "minecraft:default",
+  "structure": "minehouse:mob_stray",
+  "max_ticks": 1200,
+  "manual_only": false
+}
