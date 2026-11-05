@@ -317,9 +317,9 @@ def register(b):
 
     kill("iron_golem", "zombie")
     kill("zoglin", "cow")
-    kill("vindicator", "villager", 'equipment:{mainhand:{id:"minecraft:iron_axe"}}')
-    kill("pillager", "villager", 'equipment:{mainhand:{id:"minecraft:crossbow"}}')
-    kill("ravager", "villager")
+    kill("vindicator", "villager", 'equipment:{mainhand:{id:"minecraft:iron_axe"}}', target_nbt="NoAI:1b")
+    kill("pillager", "villager", 'equipment:{mainhand:{id:"minecraft:crossbow"}}', target_nbt="NoAI:1b")
+    kill("ravager", "villager", target_nbt="NoAI:1b")
     kill("guardian", "squid", water=True)
     kill("frog", "slime", target_nbt="Size:0")
     # tamed wolves and cats never bred in a test (no owner online), so test hunting
