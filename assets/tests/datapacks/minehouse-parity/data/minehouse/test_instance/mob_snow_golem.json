@@ -1,0 +1,7 @@
+{
+  "type": "minecraft:block_based",
+  "environment": "minecraft:default",
+  "structure": "minehouse:mob_snow_golem",
+  "max_ticks": 60,
+  "manual_only": false
+}

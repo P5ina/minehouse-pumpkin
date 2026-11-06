@@ -1,0 +1,7 @@
+{
+  "type": "minecraft:block_based",
+  "environment": "minecraft:default",
+  "structure": "minehouse:mob_husk",
+  "max_ticks": 1000,
+  "manual_only": false
+}

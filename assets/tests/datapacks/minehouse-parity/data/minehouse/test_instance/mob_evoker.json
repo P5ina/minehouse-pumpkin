@@ -1,0 +1,7 @@
+{
+  "type": "minecraft:block_based",
+  "environment": "minecraft:default",
+  "structure": "minehouse:mob_evoker",
+  "max_ticks": 400,
+  "manual_only": false
+}

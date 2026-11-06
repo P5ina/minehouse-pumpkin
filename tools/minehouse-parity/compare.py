@@ -5,8 +5,10 @@ usage: compare.py <vanilla-junit.xml> <pumpkin.json> [known-gaps.txt]
 
 Exit code 1 when:
   - a test fails on vanilla (the test itself is wrong),
-  - a test fails on Pumpkin and is not in known-gaps.txt (regression),
-  - a test in known-gaps.txt passes on Pumpkin (remove it from the list).
+  - a test fails on Pumpkin and is not in known-gaps.txt (regression).
+A known gap that passes is only reported (mob AI is random, so a half-done
+behaviour can pass some runs); remove it from the list once it keeps passing.
+A `~` prefix marks gaps already seen passing on some runs.
 Writes a Markdown table to $GITHUB_STEP_SUMMARY when it is set.
 """
 import json
@@ -27,9 +29,11 @@ def main():
     vanilla = vanilla_results(sys.argv[1])
     pumpkin = {r["test"]: r for r in json.loads(Path(sys.argv[2]).read_text())}
     gaps_file = Path(sys.argv[3]) if len(sys.argv) > 3 else Path(__file__).with_name("known-gaps.txt")
-    gaps = {l.strip() for l in gaps_file.read_text().splitlines() if l.strip() and not l.startswith("#")}
+    lines = [l.strip() for l in gaps_file.read_text().splitlines() if l.strip() and not l.startswith("#")]
+    flaky = {l[1:].strip() for l in lines if l.startswith("~")}
+    gaps = {l.lstrip("~").strip() for l in lines}
 
-    rows, errors = [], []
+    rows, errors, notes = [], [], []
     for test in sorted(set(vanilla) | set(pumpkin)):
         v = vanilla.get(test)
         p = pumpkin.get(test, {}).get("passed")
@@ -41,11 +45,11 @@ def main():
             errors.append(f"{test}: did not run on Pumpkin")
         elif not p and test not in gaps:
             errors.append(f"{test}: fails on Pumpkin (regression, or add it to known-gaps.txt)")
-        elif p and test in gaps:
-            errors.append(f"{test}: passes on Pumpkin now, remove it from known-gaps.txt")
+        elif p and test in gaps and test not in flaky:
+            notes.append(f"{test}: passed on Pumpkin this run; if it keeps passing, remove it from known-gaps.txt")
         mark = lambda x: "✅" if x else ("❌" if x is False else "—")
         note = "; ".join(m for m in pumpkin.get(test, {}).get("messages", []) if "failed" in m)
-        rows.append(f"| `{test}` | {mark(v)} | {mark(p)} | {'known gap' if test in gaps else ''} {note} |")
+        rows.append(f"| `{test}` | {mark(v)} | {mark(p)} | {'unstable gap' if test in flaky else 'known gap' if test in gaps else ''} {note} |")
 
     passed = sum(1 for r in pumpkin.values() if r["passed"])
     summary = [
@@ -55,6 +59,8 @@ def main():
         "|---|---|---|---|",
         *rows,
     ]
+    if notes:
+        summary += ["", "**Known gaps that passed:**", *[f"- {n}" for n in notes]]
     if errors:
         summary += ["", "**Problems:**", *[f"- {e}" for e in errors]]
     text = "\n".join(summary)

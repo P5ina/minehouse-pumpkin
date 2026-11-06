@@ -1,0 +1,7 @@
+{
+  "type": "minecraft:block_based",
+  "environment": "minecraft:default",
+  "structure": "minehouse:mob_hoglin",
+  "max_ticks": 500,
+  "manual_only": false
+}
